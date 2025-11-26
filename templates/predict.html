@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Assessment - Stroke Risk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="container" style="max-width: 900px;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 2rem;">
+            <svg class="brain-icon" style="margin-bottom: 0; width: 40px; height: 40px;"
+                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" color="#0ea5e9">
+                <path
+                    d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z">
+                </path>
+                <path
+                    d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z">
+                </path>
+            </svg>
+            <h1 style="margin-bottom: 0; font-size: 1.5rem;">Patient Assessment</h1>
+        </div>
+
+        <form action="{{ url_for('predict') }}" method="POST" class="predict-form">
+
+            <!-- Demographics -->
+            <div class="form-group">
+                <label for="age">Age</label>
+                <input type="number" step="0.1" name="age" required placeholder="Years">
+            </div>
+
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select name="gender" required>
+                    <option value="" disabled selected>Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="marital_family_history">Family History of Stroke</label>
+                <select name="marital_family_history" required>
+                    <option value="" disabled selected>Select Status</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <!-- Medical History -->
+            <div class="form-group">
+                <label for="hypertension">Hypertension</label>
+                <select name="hypertension" required>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="heart_disease">Heart Disease</label>
+                <select name="heart_disease" required>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="previous_stroke_tia">Previous Stroke/TIA</label>
+                <select name="previous_stroke_tia" required>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="kidney_disease">Kidney Disease</label>
+                <select name="kidney_disease" required>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <!-- Vitals & Labs -->
+            <div class="form-group">
+                <label for="bmi">BMI</label>
+                <input type="number" step="0.1" name="bmi" required placeholder="kg/m²">
+            </div>
+
+            <div class="form-group">
+                <label for="systolic_bp">Systolic BP</label>
+                <input type="number" step="0.1" name="systolic_bp" required placeholder="mmHg">
+            </div>
+
+            <div class="form-group">
+                <label for="diastolic_bp">Diastolic BP</label>
+                <input type="number" step="0.1" name="diastolic_bp" required placeholder="mmHg">
+            </div>
+
+            <div class="form-group">
+                <label for="blood_sugar">Blood Glucose</label>
+                <input type="number" step="0.1" name="blood_sugar" required placeholder="mg/dL">
+            </div>
+
+            <!-- Cholesterol Profile -->
+            <div class="form-group">
+                <label for="chol_total">Total Cholesterol</label>
+                <input type="number" step="0.1" name="chol_total" required placeholder="mg/dL">
+            </div>
+
+            <div class="form-group">
+                <label for="chol_hdl">HDL Cholesterol</label>
+                <input type="number" step="0.1" name="chol_hdl" required placeholder="mg/dL">
+            </div>
+
+            <div class="form-group">
+                <label for="chol_ldl">LDL Cholesterol</label>
+                <input type="number" step="0.1" name="chol_ldl" required placeholder="mg/dL">
+            </div>
+
+            <div class="form-group">
+                <label for="chol_triglycerides">Triglycerides</label>
+                <input type="number" step="0.1" name="chol_triglycerides" required placeholder="mg/dL">
+            </div>
+
+            <div class="form-group">
+                <label for="high_cholesterol_flag">High Cholesterol History</label>
+                <select name="high_cholesterol_flag" required>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="diabetes_flag">Diabetes History</label>
+                <select name="diabetes_flag" required>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <!-- Lifestyle -->
+            <div class="form-group">
+                <label for="smoking_status">Smoking Status</label>
+                <select name="smoking_status" required>
+                    <option value="" disabled selected>Select Status</option>
+                    <option value="Never">Never</option>
+                    <option value="Former">Former</option>
+                    <option value="Current">Current</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="alcohol_consumption">Alcohol Consumption</label>
+                <select name="alcohol_consumption" required>
+                    <option value="" disabled selected>Select Level</option>
+                    <option value="Rare">Rare</option>
+                    <option value="Moderate">Moderate</option>
+                    <option value="Heavy">Heavy</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="physical_activity">Physical Activity</label>
+                <select name="physical_activity" required>
+                    <option value="" disabled selected>Select Level</option>
+                    <option value="Sedentary">Sedentary</option>
+                    <option value="Moderate">Moderate</option>
+                    <option value="Active">Active</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="dietary_habits">Dietary Habits</label>
+                <select name="dietary_habits" required>
+                    <option value="" disabled selected>Select Type</option>
+                    <option value="Healthy">Healthy</option>
+                    <option value="Balanced">Balanced</option>
+                    <option value="Poor">Poor</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="sleep_hours">Sleep Hours (Avg)</label>
+                <input type="number" step="0.1" name="sleep_hours" required placeholder="Hours/night">
+            </div>
+
+            <div class="full-width">
+                <button type="submit">Analyze Risk Profile</button>
+            </div>
+        </form>
+        <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <a href="{{ url_for('logout') }}" style="font-size: 0.875rem; color: var(--text-secondary);">← Sign Out</a>
+        </div>
+    </div>
+</body>
+
+</html>

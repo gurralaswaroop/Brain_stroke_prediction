@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Analysis Complete</h1>
+
+        <div class="result-box {% if prediction == 1 %}high-risk{% else %}low-risk{% endif %}">
+            {% if prediction == 1 %}
+            <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+            <h2 style="color: inherit; margin-bottom: 0.5rem;">High Risk Detected</h2>
+            <p style="margin-bottom: 1rem;">The clinical model indicates a significant probability of stroke risk.</p>
+            {% else %}
+            <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+            <h2 style="color: inherit; margin-bottom: 0.5rem;">Low Risk Profile</h2>
+            <p style="margin-bottom: 1rem;">The clinical model indicates a low probability of stroke risk.</p>
+            {% endif %}
+
+            <div style="background: rgba(255,255,255,0.5); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                <p
+                    style="margin: 0; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary);">
+                    Calculated Probability</p>
+                <p style="font-size: 2.5rem; font-weight: 700; margin: 0.5rem 0 0 0;">{{ (probability * 100) | round(2)
+                    }}%</p>
+            </div>
+        </div>
+
+        <a href="{{ url_for('predict') }}"><button>Assess Another Patient</button></a>
+        <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <a href="{{ url_for('logout') }}" style="font-size: 0.875rem; color: var(--text-secondary);">← Sign Out</a>
+        </div>
+    </div>
+</body>
+
+</html>

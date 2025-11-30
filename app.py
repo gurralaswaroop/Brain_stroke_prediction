@@ -2,9 +2,42 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 import pickle
 import numpy as np
 import pandas as pd
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from models import db, User
+import os
+from dotenv import load_dotenv
+
+import logging
+from logging.handlers import RotatingFileHandler
+
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # Change this for production
+app.secret_key = os.getenv('SECRET_KEY', 'supersecretkey')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///db.sqlite3')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Configure logging
+if not app.debug:
+    if not os.path.exists('logs'):
+        os.mkdir('logs')
+    file_handler = RotatingFileHandler('logs/brain_stroke.log', maxBytes=10240, backupCount=10)
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
+    app.logger.setLevel(logging.INFO)
+    app.logger.info('Brain Stroke Prediction startup')
+
+db.init_app(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 # Load model and preprocessors
 with open('model.pkl', 'rb') as f:
@@ -16,35 +49,59 @@ with open('scaler.pkl', 'rb') as f:
 with open('label_encoders.pkl', 'rb') as f:
     label_encoders = pickle.load(f)
 
+# Database tables will be created via init_db.py or manual command
+
+
 @app.route('/')
 def index():
-    if 'user' in session:
+    if current_user.is_authenticated:
         return redirect(url_for('predict'))
     return render_template('login.html')
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    username = request.form['username']
-    password = request.form['password']
-    
-    # Dummy authentication
-    if username == 'admin' and password == 'admin':
-        session['user'] = username
-        return redirect(url_for('predict'))
-    else:
-        flash('Invalid Credentials. Try admin/admin', 'error')
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        user = User.query.filter_by(username=username).first()
+        
+        if user and user.check_password(password):
+            login_user(user)
+            return redirect(url_for('predict'))
+        else:
+            flash('Invalid username or password', 'error')
+            return redirect(url_for('index'))
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists', 'error')
+            return redirect(url_for('register'))
+        
+        new_user = User(username=username)
+        new_user.set_password(password)
+        db.session.add(new_user)
+        db.session.commit()
+        
+        flash('Registration successful! Please login.', 'success')
         return redirect(url_for('index'))
+    return render_template('register.html')
 
 @app.route('/logout')
+@login_required
 def logout():
-    session.pop('user', None)
+    logout_user()
     return redirect(url_for('index'))
 
 @app.route('/predict', methods=['GET', 'POST'])
+@login_required
 def predict():
-    if 'user' not in session:
-        return redirect(url_for('index'))
-    
     if request.method == 'POST':
         try:
             # Extract data from form

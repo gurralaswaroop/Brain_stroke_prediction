@@ -6,14 +6,16 @@ A machine learning-powered web application that predicts the risk of brain strok
 
 - **Accurate Prediction**: Uses a trained Machine Learning model to assess stroke risk.
 - **Modern UI**: Clean, glassmorphism-based design for a professional look.
-- **Secure Access**: Simple login system for authorized access.
+- **Secure Authentication**: Database-backed user registration and login system.
 - **Responsive Design**: Works seamlessly on desktop and mobile devices.
 - **Instant Results**: Provides immediate risk assessment with probability scores.
 
 ## Tech Stack
 
-- **Backend**: Python, Flask
+- **Backend**: Python, Flask, Flask-SQLAlchemy, Flask-Login
 - **Frontend**: HTML5, CSS3 (Modern Design System)
+- **Database**: SQLite (Production-ready)
+- **Server**: Gunicorn
 - **Machine Learning**: Scikit-learn, Pandas, NumPy
 
 ## Installation
@@ -35,21 +37,30 @@ A machine learning-powered web application that predicts the risk of brain strok
     pip install -r requirements.txt
     ```
 
-4.  **Run the application**:
+4.  **Initialize the Database**:
     ```bash
-    python app.py
+    python init_db.py
     ```
 
-5.  **Access the app**:
-    Open your browser and go to `http://127.0.0.1:5000/`.
+5.  **Run the application**:
+    *   **Development**:
+        ```bash
+        python app.py
+        ```
+    *   **Production**:
+        ```bash
+        gunicorn wsgi:app
+        ```
+
+6.  **Access the app**:
+    Open your browser and go to `http://127.0.0.1:5000/` (or `http://127.0.0.1:8000/` for Gunicorn).
 
 ## Usage
 
-1.  **Login**: Use the default credentials:
-    *   Username: `admin`
-    *   Password: `admin`
-2.  **Enter Data**: Fill in the patient's demographic and medical details.
-3.  **Predict**: Click "Analyze Risk Profile" to see the result.
+1.  **Register**: Create a new account using the "Create an account" link on the login page.
+2.  **Login**: Use your newly created credentials to access the system.
+3.  **Enter Data**: Fill in the patient's demographic and medical details.
+4.  **Predict**: Click "Analyze Risk Profile" to see the result.
 
 ## Model Information
 
